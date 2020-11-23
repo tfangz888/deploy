@@ -7,3 +7,5 @@
    #!/usr/bin/bash  
    export QLIC=/q  
    export QHOME=/q  
+2. 配置/mylab/datasource/tdx  /data/datasource/tdx  
+
