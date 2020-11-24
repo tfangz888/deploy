@@ -1,0 +1,23 @@
+# sudo crontab -e用于以root权限运行脚本. 每个用户有不同的cron配置
+
+# reboot your system every day at 4:05am. (4:00am + 5 minutes) 每天重启
+0 4   *   *   *    /sbin/shutdown -r +5
+
+# 取消自动从互联网同步时间
+# timedatectl set-ntp 0
+# 打开可以运行
+# timedatectl set-ntp 1
+# 如果打开自动对时,则忽略此同步时间
+# @reboot (sleep 10 ; sudo /sbin/ntpdate time.windows.com ) # 同步时间方法一
+# 03  04 * * 1,2,3,4,5  sudo htpdate -ds  www.baidu.com www.qq.com; sudo hwclock -w # 同步时间方法二
+
+# @reboot (sleep 60 ; nohup bash /home/toby/mylab/datasource/tdx/download_rest_history.sh >/dev/null 2>&1 )
+@reboot (sleep 60 ; bash /mylab/datasource/tdx/download_rest_history.sh )
+
+# 开机60seconds后启动
+# @reboot (sleep 10 ; bash /home/toby/mylab/boot_clear.sh )
+# @reboot (sleep 60 ; at -f /home/toby/mylab/xingye_ut/xingye.at 09:31 ) # 订阅xingye的数据
+
+# @reboot (sleep 120 ; /home/toby/q/v3.6/l32/q /home/toby/q/feedhandler/xingye_feed.q >/dev/null 2>&1 & )
+# @reboot (sleep 1 ; source /home/toby/q/env32.sh; /home/toby/q/v3.6/l32/q >/tmp/q.txt 2>&1 <<< '\l /home/toby/q/feedhandler/xingye_feed.q' )
+@reboot (sleep 2; source /q/env.sh; cd /tmp/; /q/l64/q 2>&1 /mylab/feedhandler/xingye_feed.q )
