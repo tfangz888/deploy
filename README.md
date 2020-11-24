@@ -9,3 +9,5 @@
    export QHOME=/q  
 2. 配置/mylab/datasource/tdx  /data/datasource/tdx  
 
+3. cp q.xingye/feedhandler/xingye_ut.q ==> /mylab/q/feedhandler/xingye_ut.q  
+
