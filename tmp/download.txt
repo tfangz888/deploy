@@ -1,0 +1,56 @@
+# /mylab/app/vendor/tdx/downloadtdx.service 做什么 + 失败重试
+[Unit]
+Description=Run downloadtdx.sh
+# 失败重试上限：5次（在 StartLimitIntervalSec 这个时间窗口内）
+StartLimitIntervalSec=24h
+StartLimitBurst=5
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/downloadtdx.sh
+
+# 失败则重试
+Restart=on-failure
+RestartSec=10min
+
+
+# Restart=on-failure：只有失败才重试
+# RestartSec=10min：每次失败后等 10 分钟再试
+
+# StartLimitBurst=5 + StartLimitIntervalSec=24h：在 24 小时内最多启动（含第一次+重试）5 次；这样就实现“最多重试 5 次”的效果（不会无限重试）
+
+###################################################################
+
+
+# /mylab/app/vendor/tdx/downloadtdx.timer  什么时候跑 + 随机延迟 + 补跑
+[Unit]
+Description=Run downloadtdx.service Mon-Fri at 20:00 with randomized delay
+
+[Timer]
+# 周一到周五 晚上 20:00
+OnCalendar=Mon..Fri 20:00:00
+
+# 随机延迟（例如 0~20分钟 内随机）
+RandomizedDelaySec=20min
+
+# 如果当时关机错过了，开机后补跑一次
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+###################################################################
+sudo systemctl daemon-reload
+sudo systemctl enable --now downloadtdx.timer
+
+# 看下次触发时间
+systemctl list-timers --all | grep downloadtdx
+# 看 timer 状态
+systemctl status downloadtdx.timer
+# 看执行日志
+journalctl -u downloadtdx.service
+# 实时跟踪
+journalctl -u downloadtdx.service -f
+
+
+# 临时把 downloadtdx.sh 改成 exit 1 来模拟失败，然后观察 systemd 是否每 10 分钟重试、最多 5 次
